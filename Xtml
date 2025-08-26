@@ -1,0 +1,87 @@
+import React, { useState } from "react";
+import "./App.css";
+
+const rewards = [
+  { label: "60 UC", color: "#FFD700" },
+  { label: "Royal Pass", color: "#00CFFF" },
+  { label: "Crate", color: "#FF6347" },
+  { label: "120 UC", color: "#32CD32" },
+  { label: "No Luck", color: "#AAAAAA" },
+  { label: "300 UC", color: "#FFA500" },
+  { label: "Rare Item", color: "#BA55D3" },
+  { label: "60 UC", color: "#FFD700" },
+];
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export default function App() {
+  const [spinning, setSpinning] = useState(false);
+  const [result, setResult] = useState(null);
+  const [angle, setAngle] = useState(0);
+
+  const handleSpin = () => {
+    if (spinning) return;
+    setSpinning(true);
+    setResult(null);
+    const prizeIndex = randomInt(0, rewards.length - 1);
+    const spins = randomInt(5, 8); // More spins for excitement
+    const endAngle = 360 * spins + (360 / rewards.length) * prizeIndex + 360 / (2 * rewards.length);
+    setAngle(endAngle);
+
+    setTimeout(() => {
+      setResult(rewards[prizeIndex].label);
+      setSpinning(false);
+    }, 3000);
+  };
+
+  return (
+    <div className="App">
+      <h1>Ultimate UC Spin Wheel</h1>
+      <div className="wheel-container">
+        <div
+          className="wheel"
+          style={{
+            transform: `rotate(${angle}deg)`,
+            transition: spinning ? "transform 3s cubic-bezier(.17,.67,.83,.67)" : "none",
+          }}
+        >
+          {rewards.map((reward, i) => {
+            const rotate = (360 / rewards.length) * i;
+            return (
+              <div
+                key={i}
+                className="segment"
+                style={{
+                  transform: `rotate(${rotate}deg) skewY(-45deg)`,
+                  background: reward.color,
+                }}
+              >
+                <span
+                  style={{
+                    transform: `skewY(45deg) rotate(${360 / (2 * rewards.length)}deg)`,
+                  }}
+                >
+                  {reward.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="pointer" />
+      </div>
+      <button onClick={handleSpin} disabled={spinning}>
+        {spinning ? "Spinning..." : "Spin"}
+      </button>
+      {result && (
+        <div className="result">
+          <h2>You won: {result}!</h2>
+        </div>
+      )}
+      <footer>
+        <small>For PUBG Mobile & Free Fire fans | Fast & Lightweight</small>
+      </footer>
+    </div>
+  );
+}
